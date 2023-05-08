@@ -1,0 +1,28 @@
+<h2>Player List</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th></th>
+      <th>Nombre</th>
+      <th>Valoración</th>
+      <th>País</th>
+      <th>Pierna Mala</th>
+      <th>Filigranas</th>
+      <th>Posiciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let player of players">
+      <td>{{player.id}}</td>
+      <td><img class="player-list_photo" [src]='player.photo'></td>
+      <td>{{player.short_name}}</td>
+      <td>{{player.overall}}</td>
+      <td>{{player.country}}</td>
+      <td>{{player.weak_foot}}</td>
+      <td>{{player.skill_moves}}</td>
+      <td>{{player.pref_position}}</td>
+    </tr>
+  </tbody>
+</table>
