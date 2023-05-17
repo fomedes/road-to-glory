@@ -1,4 +1,14 @@
 .player-list_photo {
   height: 50px;
   width: 50px;
+  border-radius: 50%;
+}
+
+mat-header-row {
+   background-color: #3F51B5;
+}
+
+mat-header-cell {
+  color: white;
+  font-weight: bold;
 }

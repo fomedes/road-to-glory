@@ -8,11 +8,13 @@ import { PlayerDTO } from '../models/player.dto';
 })
 export class PlayerService {
   private urlPlayerApi: string;
+  private urlPlayerPricesApi: string;
   private controller: string;
 
   constructor(private http: HttpClient) {
     this.controller = 'players';
     this.urlPlayerApi = 'http://127.0.0.1:8000/api/' + this.controller;
+    this.urlPlayerPricesApi = 'http://127.0.0.1:8000/api/prices';
   }
 
   getPlayers(): Observable<PlayerDTO[]> {
@@ -20,8 +22,10 @@ export class PlayerService {
   }
 
   getPlayerById(playerId: number): Observable<PlayerDTO[]> {
-    return this.http.get<PlayerDTO[]>(
-      'http://localhost:3000/users/players/' + playerId
-    );
+    return this.http.get<PlayerDTO[]>(this.urlPlayerApi + '/' + playerId);
+  }
+
+  getPlayerPrices(): Observable<any[]> {
+    return this.http.get<any[]>(this.urlPlayerPricesApi);
   }
 }
