@@ -14,7 +14,6 @@ import { PlayerService } from '../../services/player.service';
 export class PlayerListComponent {
   players!: PlayerDTO[];
   page: number = 1;
-  passenger: any;
   playerPrices!: any[];
   displayedColumns: string[] = [
     'playerId',

@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { AppComponent } from './app.component';
 import { MarketListComponent } from './market/components/market-list/market-list.component';
 import { PlayerItemComponent } from './players/components/player-item/player-item.component';
 import { PlayerListComponent } from './players/components/player-list/player-list.component';
 
 const routes: Routes = [
-  /*
   {
     path: '',
     component: AppComponent,
   },
-  */
+
   {
     path: 'players',
     component: PlayerListComponent,

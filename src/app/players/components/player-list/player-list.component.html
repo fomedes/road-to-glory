@@ -45,13 +45,13 @@
     <!-- Weak Foot Column -->
     <ng-container matColumnDef="weakFoot">
       <mat-header-cell *matHeaderCellDef>Pierna Mala</mat-header-cell>
-      <mat-cell *matCellDef="let player">{{ player.weak_foot }}</mat-cell>
+      <mat-cell *matCellDef="let player">{{ player.weak_foot + '&#9733;' }}</mat-cell>
     </ng-container>
   
     <!-- Skills Column -->
     <ng-container matColumnDef="skills">
       <mat-header-cell *matHeaderCellDef>Filigranas</mat-header-cell>
-      <mat-cell *matCellDef="let player">{{ player.skill_moves }}</mat-cell>
+      <mat-cell *matCellDef="let player">{{ player.skill_moves+ '&#9733;' }}</mat-cell>
     </ng-container>
 
     <!-- Positions Column -->
