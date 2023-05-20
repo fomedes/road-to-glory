@@ -1,21 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
-import { MarketListComponent } from './components/market-list/market-list.component';
+import { MatSelectModule } from '@angular/material/select';
+import { BrowserModule } from '@angular/platform-browser';
+import { LoginComponent } from './components/login/login.component';
 
 @NgModule({
-  declarations: [MarketListComponent],
+  declarations: [LoginComponent],
   imports: [
     CommonModule,
-    MatTableModule,
+    ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatPaginatorModule,
+    MatSelectModule,
     MatButtonModule,
+    BrowserModule,
   ],
 })
-export class MarketModule {}
+export class AuthModule {}

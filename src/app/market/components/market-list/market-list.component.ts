@@ -31,13 +31,14 @@ export class MarketListComponent {
   displayedColumns: string[] = [
     'playerId',
     'avatar',
+    'positions',
     'name',
     'price',
     'overall',
     'country',
     'weakFoot',
     'skills',
-    'positions',
+    'bidAmount',
   ];
 
   pageSize = 10;
@@ -147,5 +148,9 @@ export class MarketListComponent {
 
       this.countdown = `${days}d ${hours}h ${minutes}m`;
     });
+  }
+
+  sendBid(): void {
+    console.log('Puja realizada');
   }
 }

@@ -1,21 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
-import { MarketListComponent } from './components/market-list/market-list.component';
+import { MatSelectModule } from '@angular/material/select';
+import { RegisterComponent } from './components/register/register.component';
 
 @NgModule({
-  declarations: [MarketListComponent],
+  declarations: [RegisterComponent],
   imports: [
     CommonModule,
-    MatTableModule,
     MatFormFieldModule,
     MatInputModule,
-    MatPaginatorModule,
+    MatSelectModule,
+    ReactiveFormsModule,
     MatButtonModule,
   ],
 })
-export class MarketModule {}
+export class UserModule {}
