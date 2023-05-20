@@ -6,6 +6,7 @@ import { ResultsComponent } from './Dashboard/components/results/results.compone
 import { RegisterComponent } from './User/components/register/register.component';
 import { AppComponent } from './app.component';
 import { MarketListComponent } from './market/components/market-list/market-list.component';
+import { ClubComponent } from './players/components/club/club.component';
 import { PlayerItemComponent } from './players/components/player-item/player-item.component';
 import { PlayerListComponent } from './players/components/player-list/player-list.component';
 
@@ -42,6 +43,10 @@ const routes: Routes = [
   {
     path: 'results',
     component: ResultsComponent,
+  },
+  {
+    path: 'club',
+    component: ClubComponent,
   },
 ];
 

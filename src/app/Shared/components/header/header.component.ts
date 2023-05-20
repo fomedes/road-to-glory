@@ -28,4 +28,8 @@ export class HeaderComponent {
   dashboard(): void {
     this.router.navigateByUrl('dashboard');
   }
+
+  club(): void {
+    this.router.navigateByUrl('club');
+  }
 }
