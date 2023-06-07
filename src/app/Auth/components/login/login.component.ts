@@ -6,6 +6,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +20,11 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
 
   //temporary router
-  constructor(private formBuilder: FormBuilder, private router: Router) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.email = new FormControl('', [
       Validators.required,
       Validators.pattern('[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$'),
@@ -40,21 +45,13 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {}
 
   login(): void {
-    /*
-    const credentials: AuthDTO = {
-      email: this.email.value,
-      password: this.password.value,
-      user_id: '',
-      access_token: '',
-    };
+    if (this.loginForm.invalid) {
+      return;
+    }
 
-    this.store.dispatch(AuthAction.login({ credentials }));
-    */
     const email = this.loginForm.value.email;
     const password = this.loginForm.value.password;
 
-    console.log(`Email: ${email}, Password: ${password}`);
-
-    this.router.navigateByUrl('dashboard'); //temporary
+    this.authService.login(email, password);
   }
 }

@@ -59,10 +59,10 @@ export class MarketListComponent {
     this.loadMarket();
     setInterval(() => {
       this.getCountdown();
-    }, 20000);
+    }, 60000);
     setInterval(() => {
       this.getMarketSettings();
-    }, 20000);
+    }, 60000);
   }
 
   private loadMarket(): void {
@@ -140,13 +140,15 @@ export class MarketListComponent {
         (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
       );
 
+      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
       if (minutes < 1) {
         this.marketEnding = true;
       } else {
         this.marketEnding = false;
       }
 
-      this.countdown = `${days}d ${hours}h ${minutes}m`;
+      this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     });
   }
 

@@ -22,10 +22,10 @@ export class ClubComponent {
     'name',
     'price',
     'overall',
-    'country',
     'weakFoot',
     'skills',
-    'bidAmount',
+    'sell',
+    'transfer',
   ];
 
   dataSource!: MatTableDataSource<PlayerDTO>;
@@ -48,7 +48,9 @@ export class ClubComponent {
   private getClubPlayers() {
     let errorResponse: any;
 
-    this.playerIds = [41236, 158023];
+    this.playerIds = [
+      1179, 20801, 41236, 45168, 138412, 146536, 157481, 158023,
+    ];
 
     for (let id of this.playerIds) {
       this.playerService.getPlayerById(id).subscribe(
@@ -56,14 +58,14 @@ export class ClubComponent {
           console.log(id);
           console.log(player);
           this.clubPlayers.push(player);
+          console.log(this.clubPlayers);
+          this.dataSource = new MatTableDataSource<PlayerDTO>(this.clubPlayers);
         },
         (error: any) => {
           errorResponse = error.error;
         }
       );
     }
-    this.dataSource = new MatTableDataSource<PlayerDTO>(this.clubPlayers);
-    console.log(this.dataSource);
   }
 
   sellPlayer(): void {

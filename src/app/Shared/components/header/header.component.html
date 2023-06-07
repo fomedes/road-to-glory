@@ -6,7 +6,10 @@
     <button mat-button (click)="playerList()">Lista de Jugadores</button>
   </section>
   <div class="menu_right">
-    <button mat-button (click)="login()">Login</button>
-    <button mat-button (click)="register()">Registrarse</button>
+    <ng-container *ngIf="showNoAuthSection">
+      <button mat-button (click)="login()">Login</button>
+      <button mat-button (click)="register()">Registrarse</button>
+    </ng-container>
+    <button mat-button *ngIf="showAuthSection" (click)="logout()">Logout</button>
   </div>
 </mat-toolbar>

@@ -101,7 +101,12 @@ export class DashboardComponent {
     },
   ];
 
-  constructor(private router: Router) {}
+  isLoggedIn: boolean = false;
+
+  constructor(private router: Router) {
+    const loggedStatus = localStorage.getItem('authenticated');
+    this.isLoggedIn = loggedStatus === 'true';
+  }
 
   login(): void {
     this.router.navigateByUrl('login');

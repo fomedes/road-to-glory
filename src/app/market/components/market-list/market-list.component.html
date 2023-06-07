@@ -2,13 +2,9 @@
   <h1>Mercado de Jugadores</h1>
   <h2>
       <p>Reinicio del mercado:</p>
-      <ng-container *ngIf="marketEnding; else Countdown">&lt;1m</ng-container>
+      <ng-container *ngIf="marketEnding; else Countdown">{{ countdown }}</ng-container>
       <ng-template #Countdown>{{ countdown }}</ng-template>
   </h2>
-  <mat-form-field appearance="fill">
-      <mat-label>Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event)" placeholder="Search" #input>
-  </mat-form-field>
   
   <div class='table-container'>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">

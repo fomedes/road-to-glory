@@ -16,6 +16,7 @@ import { HeaderComponent } from './Shared/components/header/header.component';
 import { UserModule } from './User/user.module';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { appReducers } from './app.reducers';
 import { MarketModule } from './market/market.module';
 import { PlayerModule } from './players/player.module';
 
@@ -25,7 +26,7 @@ HeaderComponent;
   imports: [
     BrowserModule,
     AppRoutingModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot(appReducers),
     HttpClientModule,
     PlayerModule,
     MarketModule,

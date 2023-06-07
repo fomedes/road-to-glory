@@ -5,7 +5,9 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import { UserDTO } from '../../models/user.dto';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-register',
@@ -32,7 +34,11 @@ export class RegisterComponent implements OnInit {
     'PC',
   ];
 
-  constructor(private formBuilder: FormBuilder) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private userService: UserService
+  ) {
     this.registerUser = new UserDTO('', '', '', '');
 
     this.isValidForm = null;
@@ -66,7 +72,6 @@ export class RegisterComponent implements OnInit {
   ngOnInit(): void {}
 
   register(): void {
-    /*
     this.isValidForm = false;
 
     if (this.registerForm.invalid) {
@@ -83,16 +88,38 @@ export class RegisterComponent implements OnInit {
       password: this.registerUser.password,
     };
 
-    this.store.dispatch(UserAction.register({ user }));
-    */
-
-    const username = this.registerForm.value.username;
-    const platform = this.registerForm.value.platform;
-    const email = this.registerForm.value.email;
-    const password = this.registerForm.value.password;
-
-    console.log(
-      `Username: ${username} Platform: ${platform} Email: ${email}, Password: ${password}`
+    this.userService.registerUser(user).subscribe(
+      (response) => {
+        console.log('User registration successful:', response);
+        // Redirect to the login page
+        this.router.navigateByUrl('login');
+      },
+      (error) => {
+        console.error('User registration error:', error);
+      }
     );
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.registerForm.get(controlName);
+    if (control?.invalid && control?.touched) {
+      for (const errorKey in control.errors) {
+        if (control.errors.hasOwnProperty(errorKey)) {
+          switch (errorKey) {
+            case 'required':
+              return 'El campo es obligatorio';
+            case 'minlength':
+              return `Mínimo ${control.errors[errorKey].requiredLength} caracteres`;
+            case 'maxlength':
+              return `Máximo ${control.errors[errorKey].requiredLength} caracteres`;
+            case 'pattern':
+              return 'El formato no es correcto';
+            default:
+              return '';
+          }
+        }
+      }
+    }
+    return '';
   }
 }
