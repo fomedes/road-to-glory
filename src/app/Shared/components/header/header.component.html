@@ -1,8 +1,8 @@
 <mat-toolbar class="full-width-toolbar" color="primary">
   <section>
     <button mat-button (click)="navigationTo('home')">Inicio</button>
-    <button mat-button (click)="navigationTo('club')">Mi Club</button>
-    <button mat-button (click)="navigationTo('market')">Mercado</button>
+    <button mat-button *ngIf="showAuthSection" (click)="navigationTo('club')">Mi Club</button>
+    <button mat-button *ngIf="showAuthSection" (click)="navigationTo('market')">Mercado</button>
     <button mat-button (click)="navigationTo('players')">Lista de Jugadores</button>
   </section>
   <div class="menu_right">
