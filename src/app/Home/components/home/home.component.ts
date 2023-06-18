@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HeaderMenus } from 'src/app/Shared/services/header-menus.dto';
+import { HeaderMenusService } from 'src/app/Shared/services/header-menus.service';
+import { LocalStorageService } from 'src/app/Shared/services/local-storage.service';
 import { TeamDTO } from '../../models/team.dto';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
-export class DashboardComponent {
+export class HomeComponent implements OnInit {
   teams: TeamDTO[] = [
     {
       position: 1,
@@ -101,22 +104,30 @@ export class DashboardComponent {
     },
   ];
 
-  isLoggedIn: boolean = false;
+  showAuthSection: boolean;
+  showNoAuthSection: boolean;
 
-  constructor(private router: Router) {
-    const loggedStatus = localStorage.getItem('authenticated');
-    this.isLoggedIn = loggedStatus === 'true';
+  constructor(
+    private router: Router,
+    private headerMenusService: HeaderMenusService,
+    private localStorageService: LocalStorageService
+  ) {
+    this.showAuthSection = false;
+    this.showNoAuthSection = true;
   }
 
-  login(): void {
-    this.router.navigateByUrl('login');
+  ngOnInit(): void {
+    this.headerMenusService.headerManagement.subscribe(
+      (headerInfo: HeaderMenus) => {
+        if (headerInfo) {
+          this.showAuthSection = headerInfo.showAuthSection;
+          this.showNoAuthSection = headerInfo.showNoAuthSection;
+        }
+      }
+    );
   }
 
-  register(): void {
-    this.router.navigateByUrl('register');
-  }
-
-  sentResults(): void {
-    this.router.navigateByUrl('results');
+  navigationTo(route: string): void {
+    this.router.navigateByUrl(route);
   }
 }

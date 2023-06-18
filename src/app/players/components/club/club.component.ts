@@ -48,24 +48,22 @@ export class ClubComponent {
   private getClubPlayers() {
     let errorResponse: any;
 
-    this.playerIds = [
-      1179, 20801, 41236, 45168, 138412, 146536, 157481, 158023,
-    ];
-
-    for (let id of this.playerIds) {
-      this.playerService.getPlayerById(id).subscribe(
-        (player) => {
-          console.log(id);
-          console.log(player);
-          this.clubPlayers.push(player);
-          console.log(this.clubPlayers);
-          this.dataSource = new MatTableDataSource<PlayerDTO>(this.clubPlayers);
-        },
-        (error: any) => {
-          errorResponse = error.error;
-        }
-      );
-    }
+    this.playerService.getClubPlayersByUser().subscribe((resp) => {
+      this.playerIds = JSON.parse(resp.club_players);
+      for (let id of this.playerIds) {
+        this.playerService.getPlayerById(id).subscribe(
+          (player) => {
+            this.clubPlayers.push(player);
+            this.dataSource = new MatTableDataSource<PlayerDTO>(
+              this.clubPlayers
+            );
+          },
+          (error: any) => {
+            errorResponse = error.error;
+          }
+        );
+      }
+    });
   }
 
   sellPlayer(): void {

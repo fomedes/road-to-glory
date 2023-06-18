@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { AuthState } from 'src/app/Auth/reducers';
-import { logout } from '../../../Auth/actions/auth.actions';
+import { HeaderMenus } from '../../services/header-menus.dto';
+import { HeaderMenusService } from '../../services/header-menus.service';
+import { LocalStorageService } from '../../services/local-storage.service';
 
 @Component({
   selector: 'app-header',
@@ -13,45 +13,40 @@ export class HeaderComponent implements OnInit {
   showAuthSection: boolean;
   showNoAuthSection: boolean;
 
-  constructor(private router: Router, private store: Store<AuthState>) {
+  constructor(
+    private router: Router,
+    private headerMenusService: HeaderMenusService,
+    private localStorageService: LocalStorageService
+  ) {
     this.showAuthSection = false;
     this.showNoAuthSection = true;
   }
 
   ngOnInit(): void {
-    this.store.select('isLoggedIn').subscribe((auth: boolean) => {
-      this.showAuthSection = auth;
-      this.showNoAuthSection = !auth;
-    });
+    this.headerMenusService.headerManagement.subscribe(
+      (headerInfo: HeaderMenus) => {
+        if (headerInfo) {
+          this.showAuthSection = headerInfo.showAuthSection;
+          this.showNoAuthSection = headerInfo.showNoAuthSection;
+        }
+      }
+    );
   }
 
-  login(): void {
-    this.router.navigateByUrl('login');
-  }
+  navigationTo(route: string): void {
+    if (route == 'logout') {
+      this.localStorageService.remove('user_id');
 
-  logout(): void {
-    localStorage.setItem('isLoggedIn', 'false');
-    this.store.dispatch(logout());
-    this.router.navigateByUrl('login');
-  }
+      const headerInfo: HeaderMenus = {
+        showAuthSection: false,
+        showNoAuthSection: true,
+      };
 
-  register(): void {
-    this.router.navigateByUrl('register');
-  }
+      this.headerMenusService.headerManagement.next(headerInfo);
 
-  playerList(): void {
-    this.router.navigateByUrl('players');
-  }
-
-  market(): void {
-    this.router.navigateByUrl('market');
-  }
-
-  dashboard(): void {
-    this.router.navigateByUrl('dashboard');
-  }
-
-  club(): void {
-    this.router.navigateByUrl('club');
+      this.router.navigateByUrl('home');
+    } else {
+      this.router.navigateByUrl(route);
+    }
   }
 }

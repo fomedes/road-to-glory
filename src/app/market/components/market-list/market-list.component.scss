@@ -1,8 +1,20 @@
+.form-container {
+  margin-left: 20vw;
+  margin-right: 20vw;
+}
+
 .player-list_photo {
   height: 50px;
   width: 50px;
   border-radius: 50%;
 }
+
+.player-overlay_photo {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+}
+
 
 mat-header-row {
    background-color: #3F51B5;
@@ -13,13 +25,38 @@ mat-header-cell {
   font-weight: bold;
 }
 
-.table-container {
-  max-width: 70%;
-  width: 70%;
-  margin: 0 auto;
-}
-
 .bid-input {
   width: 100%;
 }
 
+.market-header{
+  display: flex; 
+  justify-content: space-between;
+}
+
+.overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+
+  height: 100%;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.flex-item {
+  width: 100%;
+  max-width: 300px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}

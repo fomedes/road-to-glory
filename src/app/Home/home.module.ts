@@ -8,11 +8,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { BrowserModule } from '@angular/platform-browser';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { HomeComponent } from './components/home/home.component';
 import { ResultsComponent } from './components/results/results.component';
 
 @NgModule({
-  declarations: [DashboardComponent, ResultsComponent],
+  declarations: [HomeComponent, ResultsComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -25,4 +25,4 @@ import { ResultsComponent } from './components/results/results.component';
     MatTableModule,
   ],
 })
-export class DashboardModule {}
+export class HomeModule {}

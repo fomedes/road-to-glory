@@ -2,44 +2,37 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { login, logout } from '../actions/auth.actions';
+import { Observable } from 'rxjs';
+import { SharedService } from 'src/app/Shared/services/shared.service';
+import { environment } from 'src/environments/environment';
+import { AuthDTO } from '../models/auth.dto';
+
+export interface AuthToken {
+  userId: string;
+  // future use access_token: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private apiUrl = environment.apiBaseUrl;
+
   private urlUserApi: string;
+  private loginController: string;
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private store: Store
+    private store: Store,
+    private sharedService: SharedService
   ) {
-    this.urlUserApi = 'http://127.0.0.1:8000/api/users/login';
+    this.loginController = 'users/login';
+
+    this.urlUserApi = this.apiUrl + this.loginController;
   }
 
-  login(email: string, password: string): void {
-    console.log(`${email}, ${password}`);
-
-    this.http.post<any>(`${this.urlUserApi}`, { email, password }).subscribe(
-      (response) => {
-        const userId = response;
-
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('isLoggedIn', 'true');
-        this.store.dispatch(login());
-
-        this.router.navigateByUrl('dashboard');
-      },
-      (error) => {
-        console.error('Login error:', error);
-      }
-    );
-  }
-
-  logout(): void {
-    localStorage.setItem('isLoggedIn', 'false');
-
-    this.store.dispatch(logout());
+  login(auth: AuthDTO): Observable<AuthToken> {
+    return this.http.post<AuthToken>(this.urlUserApi, auth);
   }
 }

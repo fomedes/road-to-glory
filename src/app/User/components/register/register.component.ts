@@ -100,7 +100,7 @@ export class RegisterComponent implements OnInit {
     );
   }
 
-  getErrorMessage(controlName: string): string {
+  getValidationMessage(controlName: string): string {
     const control = this.registerForm.get(controlName);
     if (control?.invalid && control?.touched) {
       for (const errorKey in control.errors) {

@@ -1,5 +1,5 @@
 import { ActionReducerMap } from '@ngrx/store';
-//import { AuthEffects } from './Auth/effects/auth.effects';
+import { AuthEffects } from './Auth/effects/auth.effects';
 import * as AuthReducer from './Auth/reducers';
 
 export interface AppState {
@@ -10,6 +10,4 @@ export const appReducers: ActionReducerMap<AppState> = {
   auth: AuthReducer.authReducer,
 };
 
-export const EffectsArray: any[] = [
-  //AuthEffects,
-];
+export const EffectsArray: any[] = [AuthEffects];

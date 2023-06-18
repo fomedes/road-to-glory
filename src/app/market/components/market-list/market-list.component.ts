@@ -1,14 +1,21 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
+import { PlayerDTO } from 'src/app/Players/models/player.dto';
+import { PlayerService } from 'src/app/Players/services/player.service';
 import { SpanishPaginatorIntl } from 'src/app/Shared/spanish-paginator-intl';
-import { PlayerDTO } from 'src/app/players/models/player.dto';
-import { PlayerService } from 'src/app/players/services/player.service';
-import {
-  MarketSettingsDTO,
-  SelectedPlayers,
-} from '../../models/marketSettings.dto';
+import { SelectedPlayers } from '../../models/auctionPlayers.dto';
+import { MarketSettingsDTO } from '../../models/marketSettings.dto';
 import { selectedPlayerDTO } from '../../models/selectedPlayer.dto';
 import { MarketService } from '../../services/market.service';
 
@@ -18,24 +25,30 @@ import { MarketService } from '../../services/market.service';
   styleUrls: ['./market-list.component.scss'],
 })
 export class MarketListComponent {
+  @ViewChild('bidOverlay') bidOverlay!: TemplateRef<any>;
+
   players!: PlayerDTO[];
   marketSettings!: MarketSettingsDTO[];
   selectedPlayers!: SelectedPlayers[];
-  auctionedPlayers!: PlayerDTO[];
+  auctionedPlayers: any[] = [];
   playerIds!: number[];
   countdown: string = '';
+  userFunds!: number;
   marketEnding: boolean = false;
+  dialogRef!: MatDialogRef<any>;
+  player: any;
+
+  bidForm: FormGroup;
+  bidAmount: FormControl;
 
   page: number = 1;
   playerPrices!: any[];
   displayedColumns: string[] = [
-    'playerId',
     'avatar',
     'positions',
     'name',
     'price',
     'overall',
-    'country',
     'weakFoot',
     'skills',
     'bidAmount',
@@ -53,7 +66,9 @@ export class MarketListComponent {
     private marketService: MarketService,
     private playerService: PlayerService,
     private router: Router,
-    private paginatorIntl: MatPaginatorIntl
+    private paginatorIntl: MatPaginatorIntl,
+    private dialog: MatDialog,
+    private formBuilder: FormBuilder
   ) {
     this.paginatorIntl = new SpanishPaginatorIntl();
     this.loadMarket();
@@ -63,6 +78,18 @@ export class MarketListComponent {
     setInterval(() => {
       this.getMarketSettings();
     }, 60000);
+
+    this.bidAmount = new FormControl('', [
+      Validators.required,
+      Validators.pattern(/^\d+$/),
+      this.divisibleBidValidator(),
+      this.bidAmountValidator(),
+      this.fundsValidator(),
+    ]);
+
+    this.bidForm = this.formBuilder.group({
+      bidAmount: this.bidAmount,
+    });
   }
 
   private loadMarket(): void {
@@ -100,9 +127,13 @@ export class MarketListComponent {
   }
 
   private getMarketSettings() {
-    this.marketService.getMarketSettings().subscribe((marketSettings) => {
-      this.marketSettings = marketSettings[0];
-      this.selectedPlayers = marketSettings[0].selected_players;
+    let errorResponse: any;
+
+    this.getFunds();
+
+    this.marketService.getAuctionPlayers().subscribe((auctionPlayers) => {
+      this.marketSettings = auctionPlayers[0];
+      this.selectedPlayers = auctionPlayers[0].selected_players;
 
       const parsedSelectedPlayers = Array.isArray(this.selectedPlayers)
         ? this.selectedPlayers
@@ -139,20 +170,122 @@ export class MarketListComponent {
       const minutes = Math.floor(
         (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
       );
-
-      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
       if (minutes < 1) {
         this.marketEnding = true;
       } else {
         this.marketEnding = false;
       }
 
-      this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      this.countdown = `${days}d ${hours}h ${minutes}m`;
     });
   }
 
-  sendBid(): void {
-    console.log('Puja realizada');
+  private getFunds(): void {
+    this.marketService.getUserFunds().subscribe((resp) => {
+      this.userFunds = resp.funds;
+    });
+  }
+
+  // Overlay methods
+
+  public bidPlayerOverlay(player: any): void {
+    this.player = player;
+    this.player.shortName = player.short_name;
+    this.player.price = this.playerPrices[player.overall];
+    this.dialogRef = this.dialog.open(this.bidOverlay, {
+      width: '300px',
+      height: '450px',
+      disableClose: true,
+    });
+  }
+
+  public sendBid(player: PlayerDTO) {
+    const user_id = localStorage.getItem('user_id');
+    const bidAmount = this.bidForm.value.bidAmount;
+
+    const bidData: selectedPlayerDTO = {
+      player_id: player.id,
+      bidding_club: user_id,
+      bidding_amount: bidAmount,
+      bidding_date: new Date(),
+    };
+
+    this.marketService.bidPlayer(bidData).subscribe(
+      (response) => {
+        console.log('Bid placed succesfully:', response);
+        // Close Overlay and reset form
+        this.dialogRef.close();
+        this.bidForm.reset();
+      },
+      (error) => {
+        console.error('Bid placement error:', error);
+      }
+    );
+  }
+
+  public closeOverlay(dialogRef: MatDialogRef<any>) {
+    dialogRef.close();
+    this.bidForm.reset();
+  }
+
+  // Custom Validators and Error Messages
+
+  divisibleBidValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = control.value;
+      if (isNaN(value) || value % 100000 !== 0) {
+        return { divisibleBid: true };
+      }
+      return null;
+    };
+  }
+
+  private bidAmountValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      if (!this.player) {
+        return null;
+      }
+      const bidAmount = control.value;
+      const playerPrice = this.player.price;
+      if (bidAmount < playerPrice) {
+        return { invalidBid: true };
+      }
+
+      return null;
+    };
+  }
+
+  private fundsValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const bidAmount = control.value;
+      const isValid = bidAmount <= this.userFunds;
+      return isValid ? null : { exceedsFunds: true };
+    };
+  }
+
+  getValidationMessage(controlName: string): string {
+    const control = this.bidForm.get(controlName);
+    if (control?.invalid && control?.touched) {
+      for (const errorKey in control.errors) {
+        if (control.errors.hasOwnProperty(errorKey)) {
+          switch (errorKey) {
+            case 'required':
+              return 'El campo es obligatorio';
+            case 'pattern':
+              return 'Introduce una puja numérica';
+            case 'divisibleBid':
+              return `La puja debe ser divisible por 100000`;
+            case 'invalidBid':
+              return `La puja debe ser igual o mayor al valor del jugador`;
+            case 'exceedsFunds':
+              return `No tienes suficiente presupuesto`;
+
+            default:
+              return '';
+          }
+        }
+      }
+    }
+    return '';
   }
 }

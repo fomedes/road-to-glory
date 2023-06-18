@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
@@ -6,7 +7,15 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { Store } from '@ngrx/store';
+import { finalize } from 'rxjs/operators';
+import { HeaderMenus } from 'src/app/Shared/services/header-menus.dto';
+import { HeaderMenusService } from 'src/app/Shared/services/header-menus.service';
+import { LocalStorageService } from 'src/app/Shared/services/local-storage.service';
+import { SharedService } from 'src/app/Shared/services/shared.service';
+import { AuthDTO } from '../../models/auth.dto';
+import { AuthState } from '../../reducers';
+import { AuthService, AuthToken } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -14,6 +23,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
+  loginUser: AuthDTO;
   email: FormControl;
   password: FormControl;
 
@@ -23,8 +33,14 @@ export class LoginComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private sharedService: SharedService,
+    private headerMenusService: HeaderMenusService,
+    private localStorageService: LocalStorageService,
+    private store: Store<AuthState>
   ) {
+    this.loginUser = new AuthDTO('', '', '', '', '');
+
     this.email = new FormControl('', [
       Validators.required,
       Validators.pattern('[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$'),
@@ -45,13 +61,50 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {}
 
   login(): void {
-    if (this.loginForm.invalid) {
-      return;
-    }
+    let responseOK: boolean = false;
+    let errorResponse: any;
 
-    const email = this.loginForm.value.email;
-    const password = this.loginForm.value.password;
+    this.loginUser.email = this.email.value;
+    this.loginUser.password = this.password.value;
 
-    this.authService.login(email, password);
+    this.authService
+      .login(this.loginUser)
+      .pipe(
+        finalize(async () => {
+          await this.sharedService.managementToast(
+            'loginFeedback',
+            responseOK,
+            errorResponse
+          );
+
+          if (responseOK) {
+            const headerInfo: HeaderMenus = {
+              showAuthSection: true,
+              showNoAuthSection: false,
+            };
+            this.headerMenusService.headerManagement.next(headerInfo);
+            this.router.navigateByUrl('home');
+          }
+        })
+      )
+      .subscribe(
+        (resp: AuthToken) => {
+          responseOK = true;
+          this.loginUser.userId = resp.userId;
+
+          this.localStorageService.set('user_id', this.loginUser.userId);
+        },
+        (error: HttpErrorResponse) => {
+          responseOK = false;
+          errorResponse = error.error;
+          const headerInfo: HeaderMenus = {
+            showAuthSection: false,
+            showNoAuthSection: true,
+          };
+          this.headerMenusService.headerManagement.next(headerInfo);
+
+          this.sharedService.errorLog(error.error);
+        }
+      );
   }
 }

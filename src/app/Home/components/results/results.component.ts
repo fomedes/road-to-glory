@@ -34,7 +34,7 @@ export class ResultsComponent {
   sendResults() {
     if (this.resultsForm.valid) {
       console.log(this.resultsForm.value);
-      this.router.navigateByUrl('dashboard'); //temporary
+      this.router.navigateByUrl('home'); //temporary
     }
   }
 }
